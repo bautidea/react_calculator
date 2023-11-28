@@ -1,0 +1,56 @@
+html {
+  /* 
+    Here we use 62.5% because the default size of web pages is 16px, if we give it 
+    62.5% * 16px = 10px, its easyer for us to set the font size of each element,
+    knowing that the size of the parent element is 10px.
+  */
+  font-size: 62.5%;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  font-size: 2rem;
+}
+
+button {
+  font-size: 2rem;
+}
+
+.calculator {
+  display: grid;
+  grid-template-rows: minmax(8rem, auto) repeat(5, 8rem);
+  grid-template-columns: repeat(4, 8rem);
+  gap: 0.25rem;
+  justify-content: center;
+  align-content: center;
+  margin-top: 2rem;
+}
+
+.output {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding: 0.5rem;
+  background: #232c33;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+.span-two {
+  grid-column: span 2;
+}
+
+.previous-operand {
+  height: 25%;
+  padding-bottom: 1rem;
+  font-size: 2.3rem;
+  color: #dadff7;
+}
+
+.current-operand {
+  height: 75%;
+  font-size: 4rem;
+  color: white;
+}
