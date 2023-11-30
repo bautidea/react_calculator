@@ -5,25 +5,41 @@ html {
     knowing that the size of the parent element is 10px.
   */
   font-size: 62.5%;
-  font-family: 'Inter', sans-serif;
+  font-family: Inter, sans-serif;
+}
+
+body,
+button {
+  font-size: 2rem;
+  font-family: Inter, sans-serif;
 }
 
 body {
-  font-size: 2rem;
-}
-
-button {
-  font-size: 2rem;
+  background: radial-gradient(
+    circle,
+    rgba(0, 48, 73, 1) 0%,
+    rgba(255, 220, 148, 1) 100%
+  );
 }
 
 .calculator {
   display: grid;
   grid-template-rows: minmax(8rem, auto) repeat(5, 8rem);
   grid-template-columns: repeat(4, 8rem);
-  gap: 0.25rem;
   justify-content: center;
-  align-content: center;
   margin-top: 2rem;
+}
+
+.calculator > button {
+  background-color: rgba(255, 220, 148, 1);
+  cursor: pointer;
+  border: 1px solid white;
+  outline: none;
+}
+
+.calculator > button:hover,
+.calculator > button:focus {
+  background-color: rgb(252, 234, 199);
 }
 
 .output {
@@ -33,7 +49,8 @@ button {
   align-items: flex-end;
   justify-content: space-around;
   padding: 0.5rem;
-  background: #232c33;
+  background: rgba(0, 48, 73, 1);
+  border: 1px solid white;
   word-wrap: break-word;
   word-break: break-all;
 }
@@ -45,12 +62,12 @@ button {
 .previous-operand {
   height: 25%;
   padding-bottom: 1rem;
-  font-size: 2.3rem;
-  color: #dadff7;
+  font-size: 2rem;
+  color: #e8edfd;
 }
 
 .current-operand {
   height: 75%;
-  font-size: 4rem;
+  font-size: 3rem;
   color: white;
 }
