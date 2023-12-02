@@ -11,6 +11,16 @@ const reducer = (state, action) => {
     }
 
     case 'delDigit': {
+      // If there is any operator in the 'previousOperator' then it means that a result is being
+      // shown,and a result cant be modified, so im returning state as it is.
+      const operatorsToCheck = ['/', '*', '-', '+'];
+      if (
+        operatorsToCheck.some((operator) =>
+          state.previousOperand.includes(operator)
+        )
+      )
+        return { ...state };
+
       return {
         ...state,
         currentOperand: state.currentOperand.slice(0, -1),
@@ -42,9 +52,9 @@ const reducer = (state, action) => {
       );
 
       return {
-        previousOperand: `${state.previousOperand} ${state.operator} ${state.currentOperand}`,
+        currentOperand: `${result}`,
         operator: '',
-        currentOperand: result,
+        previousOperand: `${state.previousOperand} ${state.operator} ${state.currentOperand}`,
       };
     }
   }
