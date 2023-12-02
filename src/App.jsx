@@ -2,6 +2,15 @@ import { useReducer } from 'react';
 import './styles.css';
 
 const reducer = (state, action) => {
+  // Declaring function to check if there is an operator in the 'previousOperator'.
+  // If there is an operator it means that a result is being shown, and then it can be modified.
+  const checkIfOperator = () => {
+    const operatorsToCheck = ['/', '*', '-', '+'];
+    return operatorsToCheck.some((operator) =>
+      state.previousOperand.includes(operator)
+    );
+  };
+
   switch (action.type) {
     case 'addDigit': {
       return {
@@ -11,15 +20,7 @@ const reducer = (state, action) => {
     }
 
     case 'delDigit': {
-      // If there is any operator in the 'previousOperator' then it means that a result is being
-      // shown,and a result cant be modified, so im returning state as it is.
-      const operatorsToCheck = ['/', '*', '-', '+'];
-      if (
-        operatorsToCheck.some((operator) =>
-          state.previousOperand.includes(operator)
-        )
-      )
-        return { ...state };
+      if (checkIfOperator()) return { ...state };
 
       return {
         ...state,
@@ -150,7 +151,10 @@ function App() {
         </button>
 
         <button
-          onClick={() => dispatch({ type: 'addDigit', numberToAdd: '.' })}
+          onClick={() => {
+            if (currentOperand)
+              dispatch({ type: 'addDigit', numberToAdd: '.' });
+          }}
         >
           .
         </button>
