@@ -5,6 +5,8 @@ const reducer = (state, action) => {
   // Declaring function to check if there is an operator in the 'previousOperator'.
   // If there is an operator it means that a result is being shown, and then it can be modified.
   const checkIfOperator = () => {
+    if (!state.previousOperand) return false;
+
     const operatorsToCheck = ['/', '*', '-', '+'];
     return operatorsToCheck.some((operator) =>
       state.previousOperand.includes(operator)
@@ -13,6 +15,12 @@ const reducer = (state, action) => {
 
   switch (action.type) {
     case 'addDigit': {
+      if (checkIfOperator())
+        return {
+          ...state,
+          currentOperand: `${action.numberToAdd}`,
+          previousOperand: '',
+        };
       return {
         ...state,
         currentOperand: `${state.currentOperand || ''}${action.numberToAdd}`,
@@ -152,8 +160,7 @@ function App() {
 
         <button
           onClick={() => {
-            if (currentOperand)
-              dispatch({ type: 'addDigit', numberToAdd: '.' });
+            dispatch({ type: 'addDigit', numberToAdd: '.' });
           }}
         >
           .
