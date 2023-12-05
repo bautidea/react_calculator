@@ -13,6 +13,12 @@ const reducer = (state, action) => {
     );
   };
 
+  const evaluateResult = () => {
+    return eval(
+      `${state.previousOperand} ${state.operator} ${state.currentOperand}`
+    );
+  };
+
   switch (action.type) {
     case 'addDigit': {
       if (checkIfOperator())
@@ -21,6 +27,7 @@ const reducer = (state, action) => {
           currentOperand: `${action.numberToAdd}`,
           previousOperand: '',
         };
+
       return {
         ...state,
         currentOperand: `${state.currentOperand || ''}${action.numberToAdd}`,
@@ -47,8 +54,11 @@ const reducer = (state, action) => {
     case 'operation': {
       if (!state.currentOperand) return { ...state };
       return {
+        previousOperand:
+          !checkIfOperator() && state.operator
+            ? `${evaluateResult()}`
+            : `${state.currentOperand}`,
         operator: action.selectedOperator,
-        previousOperand: `${state.currentOperand}`,
         currentOperand: '',
       };
     }
@@ -56,12 +66,8 @@ const reducer = (state, action) => {
     case 'evaluate': {
       if (!state.currentOperand || !state.operator) return { ...state };
 
-      const result = eval(
-        `${state.previousOperand} ${state.operator} ${state.currentOperand}`
-      );
-
       return {
-        currentOperand: `${result}`,
+        currentOperand: `${evaluateResult()}`,
         operator: '',
         previousOperand: `${state.previousOperand} ${state.operator} ${state.currentOperand}`,
       };
@@ -149,7 +155,7 @@ function App() {
         </button>
 
         <button
-          onClick={() => dispatch({ type: 'operation', selectedOperator: '/' })}
+          onClick={() => dispatch({ type: 'operation', selectedOperator: '-' })}
         >
           -
         </button>
