@@ -1,5 +1,14 @@
 import { useReducer } from 'react';
 import './styles.css';
+import DigitButton from './components/DigitButton';
+
+export const ACTIONS = {
+  ADD_DIGIT: 'addDigit',
+  DELETE_DIGIT: 'delDigit',
+  CLEAR: 'clear',
+  CHOOSE_OPERATION: 'operation',
+  EVALUATE: 'evaluate',
+};
 
 const reducer = (state, action) => {
   // Declaring function to check if there is an operator in the 'previousOperator'.
@@ -23,7 +32,11 @@ const reducer = (state, action) => {
   };
 
   switch (action.type) {
-    case 'addDigit': {
+    case ACTIONS.ADD_DIGIT: {
+      // If currentOperand contains a '.' already i return the state as it is.
+      if (action.numberToAdd === '.' && state.currentOperand.includes('.'))
+        return { ...state };
+
       if (checkIfOperator() && !state.operator)
         return {
           ...state,
@@ -37,7 +50,7 @@ const reducer = (state, action) => {
       };
     }
 
-    case 'delDigit': {
+    case ACTIONS.DELETE_DIGIT: {
       if (checkIfOperator()) return { ...state };
 
       return {
@@ -46,7 +59,7 @@ const reducer = (state, action) => {
       };
     }
 
-    case 'clear': {
+    case ACTIONS.CLEAR: {
       return {
         currentOperand: '',
         previousOperand: '',
@@ -54,7 +67,7 @@ const reducer = (state, action) => {
       };
     }
 
-    case 'operation': {
+    case ACTIONS.CHOOSE_OPERATION: {
       if (!state.currentOperand) {
         //  If there is a previousOperand and an operator then the operation can be changed.
         if (state.previousOperand && state.operator) {
@@ -71,7 +84,8 @@ const reducer = (state, action) => {
 
       return {
         previousOperand:
-          !checkIfOperator() && state.operator
+          (!checkIfOperator() || state.previousOperand.startsWith('-')) &&
+          state.operator
             ? `${evaluateResult()}`
             : `${state.currentOperand}`,
         operator: action.selectedOperator,
@@ -79,7 +93,7 @@ const reducer = (state, action) => {
       };
     }
 
-    case 'evaluate': {
+    case ACTIONS.EVALUATE: {
       if (
         !state.currentOperand ||
         state.currentOperand === '.' ||
@@ -87,7 +101,6 @@ const reducer = (state, action) => {
       )
         return { ...state };
 
-      console.log(evaluateResult());
       return {
         currentOperand: `${evaluateResult()}`,
         operator: '',
@@ -100,9 +113,14 @@ const reducer = (state, action) => {
 };
 
 function App() {
+  const initialState = {
+    currentOperand: '',
+    previousOperand: '',
+    operator: '',
+  };
   const [{ currentOperand, previousOperand, operator }, dispatch] = useReducer(
     reducer,
-    {}
+    initialState
   );
 
   return (
@@ -130,17 +148,11 @@ function App() {
           ÷
         </button>
 
-        <button onClick={() => dispatch({ type: 'addDigit', numberToAdd: 7 })}>
-          7
-        </button>
+        <DigitButton digit={7} dispatch={dispatch} />
 
-        <button onClick={() => dispatch({ type: 'addDigit', numberToAdd: 8 })}>
-          8
-        </button>
+        <DigitButton digit={8} dispatch={dispatch} />
 
-        <button onClick={() => dispatch({ type: 'addDigit', numberToAdd: 9 })}>
-          9
-        </button>
+        <DigitButton digit={9} dispatch={dispatch} />
 
         <button
           onClick={() => dispatch({ type: 'operation', selectedOperator: '*' })}
@@ -148,17 +160,11 @@ function App() {
           *
         </button>
 
-        <button onClick={() => dispatch({ type: 'addDigit', numberToAdd: 4 })}>
-          4
-        </button>
+        <DigitButton digit={4} dispatch={dispatch} />
 
-        <button onClick={() => dispatch({ type: 'addDigit', numberToAdd: 5 })}>
-          5
-        </button>
+        <DigitButton digit={5} dispatch={dispatch} />
 
-        <button onClick={() => dispatch({ type: 'addDigit', numberToAdd: 6 })}>
-          6
-        </button>
+        <DigitButton digit={6} dispatch={dispatch} />
 
         <button
           onClick={() => dispatch({ type: 'operation', selectedOperator: '+' })}
@@ -166,17 +172,11 @@ function App() {
           +
         </button>
 
-        <button onClick={() => dispatch({ type: 'addDigit', numberToAdd: 1 })}>
-          1
-        </button>
+        <DigitButton digit={1} dispatch={dispatch} />
 
-        <button onClick={() => dispatch({ type: 'addDigit', numberToAdd: 2 })}>
-          2
-        </button>
+        <DigitButton digit={2} dispatch={dispatch} />
 
-        <button onClick={() => dispatch({ type: 'addDigit', numberToAdd: 3 })}>
-          3
-        </button>
+        <DigitButton digit={3} dispatch={dispatch} />
 
         <button
           onClick={() => dispatch({ type: 'operation', selectedOperator: '-' })}
@@ -184,17 +184,9 @@ function App() {
           -
         </button>
 
-        <button onClick={() => dispatch({ type: 'addDigit', numberToAdd: 0 })}>
-          0
-        </button>
+        <DigitButton digit={0} dispatch={dispatch} />
 
-        <button
-          onClick={() => {
-            dispatch({ type: 'addDigit', numberToAdd: '.' });
-          }}
-        >
-          .
-        </button>
+        <DigitButton digit={'.'} dispatch={dispatch} />
 
         <button
           className="span-two"
