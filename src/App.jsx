@@ -14,14 +14,17 @@ const reducer = (state, action) => {
   };
 
   const evaluateResult = () => {
-    return eval(
+    const result = eval(
       `${state.previousOperand} ${state.operator} ${state.currentOperand}`
     );
+
+    if (Number.isNaN(result) || !Number.isFinite(result)) return 'Error';
+    return result;
   };
 
   switch (action.type) {
     case 'addDigit': {
-      if (checkIfOperator())
+      if (checkIfOperator() && !state.operator)
         return {
           ...state,
           currentOperand: `${action.numberToAdd}`,
@@ -52,7 +55,20 @@ const reducer = (state, action) => {
     }
 
     case 'operation': {
-      if (!state.currentOperand) return { ...state };
+      if (!state.currentOperand) {
+        //  If there is a previousOperand and an operator then the operation can be changed.
+        if (state.previousOperand && state.operator) {
+          return {
+            ...state,
+            operator: action.selectedOperator,
+          };
+          // Else we cant modify the operation.
+        } else return { ...state };
+      }
+
+      if (state.currentOperand === '.' || state.currentOperand === 'Error')
+        return { ...state };
+
       return {
         previousOperand:
           !checkIfOperator() && state.operator
@@ -64,14 +80,22 @@ const reducer = (state, action) => {
     }
 
     case 'evaluate': {
-      if (!state.currentOperand || !state.operator) return { ...state };
+      if (
+        !state.currentOperand ||
+        state.currentOperand === '.' ||
+        !state.operator
+      )
+        return { ...state };
 
+      console.log(evaluateResult());
       return {
         currentOperand: `${evaluateResult()}`,
         operator: '',
         previousOperand: `${state.previousOperand} ${state.operator} ${state.currentOperand}`,
       };
     }
+    default:
+      return state;
   }
 };
 
