@@ -1,6 +1,7 @@
 import { useReducer } from 'react';
 import './styles.css';
 import DigitButton from './components/DigitButton';
+import OperatorButton from './components/OperatorButton';
 
 export const ACTIONS = {
   ADD_DIGIT: 'addDigit',
@@ -28,19 +29,26 @@ const reducer = (state, action) => {
     );
 
     if (Number.isNaN(result) || !Number.isFinite(result)) return 'Error';
-    return result;
+    return String(result);
   };
 
   switch (action.type) {
     case ACTIONS.ADD_DIGIT: {
       // If currentOperand contains a '.' already i return the state as it is.
-      if (action.numberToAdd === '.' && state.currentOperand.includes('.'))
-        return { ...state };
+      if (action.numberToAdd === '.') {
+        if (state.currentOperand.includes('.')) return state;
+
+        if (state.currentOperand.length === 0)
+          return { ...state, currentOperand: `0${action.numberToAdd}` };
+      }
+
+      if (action.numberToAdd === '0' && state.currentOperand === '0')
+        return state;
 
       if (checkIfOperator() && !state.operator)
         return {
           ...state,
-          currentOperand: `${action.numberToAdd}`,
+          currentOperand: action.numberToAdd,
           previousOperand: '',
         };
 
@@ -51,7 +59,7 @@ const reducer = (state, action) => {
     }
 
     case ACTIONS.DELETE_DIGIT: {
-      if (checkIfOperator()) return { ...state };
+      if (checkIfOperator()) return state;
 
       return {
         ...state,
@@ -60,11 +68,7 @@ const reducer = (state, action) => {
     }
 
     case ACTIONS.CLEAR: {
-      return {
-        currentOperand: '',
-        previousOperand: '',
-        operator: '',
-      };
+      return initialState;
     }
 
     case ACTIONS.CHOOSE_OPERATION: {
@@ -76,18 +80,18 @@ const reducer = (state, action) => {
             operator: action.selectedOperator,
           };
           // Else we cant modify the operation.
-        } else return { ...state };
+        } else return state;
       }
 
       if (state.currentOperand === '.' || state.currentOperand === 'Error')
-        return { ...state };
+        return state;
 
       return {
         previousOperand:
           (!checkIfOperator() || state.previousOperand.startsWith('-')) &&
           state.operator
-            ? `${evaluateResult()}`
-            : `${state.currentOperand}`,
+            ? evaluateResult()
+            : state.currentOperand,
         operator: action.selectedOperator,
         currentOperand: '',
       };
@@ -99,10 +103,10 @@ const reducer = (state, action) => {
         state.currentOperand === '.' ||
         !state.operator
       )
-        return { ...state };
+        return state;
 
       return {
-        currentOperand: `${evaluateResult()}`,
+        currentOperand: evaluateResult(),
         operator: '',
         previousOperand: `${state.previousOperand} ${state.operator} ${state.currentOperand}`,
       };
@@ -112,12 +116,13 @@ const reducer = (state, action) => {
   }
 };
 
+const initialState = {
+  currentOperand: '',
+  previousOperand: '',
+  operator: '',
+};
+
 function App() {
-  const initialState = {
-    currentOperand: '',
-    previousOperand: '',
-    operator: '',
-  };
   const [{ currentOperand, previousOperand, operator }, dispatch] = useReducer(
     reducer,
     initialState
@@ -142,49 +147,33 @@ function App() {
 
         <button onClick={() => dispatch({ type: 'delDigit' })}>DEL</button>
 
-        <button
-          onClick={() => dispatch({ type: 'operation', selectedOperator: '/' })}
-        >
-          ÷
-        </button>
+        <OperatorButton operator={'/'} dispatch={dispatch} />
 
-        <DigitButton digit={7} dispatch={dispatch} />
+        <DigitButton digit={'7'} dispatch={dispatch} />
 
-        <DigitButton digit={8} dispatch={dispatch} />
+        <DigitButton digit={'8'} dispatch={dispatch} />
 
-        <DigitButton digit={9} dispatch={dispatch} />
+        <DigitButton digit={'9'} dispatch={dispatch} />
 
-        <button
-          onClick={() => dispatch({ type: 'operation', selectedOperator: '*' })}
-        >
-          *
-        </button>
+        <OperatorButton operator={'*'} dispatch={dispatch} />
 
-        <DigitButton digit={4} dispatch={dispatch} />
+        <DigitButton digit={'4'} dispatch={dispatch} />
 
-        <DigitButton digit={5} dispatch={dispatch} />
+        <DigitButton digit={'5'} dispatch={dispatch} />
 
-        <DigitButton digit={6} dispatch={dispatch} />
+        <DigitButton digit={'6'} dispatch={dispatch} />
 
-        <button
-          onClick={() => dispatch({ type: 'operation', selectedOperator: '+' })}
-        >
-          +
-        </button>
+        <OperatorButton operator={'+'} dispatch={dispatch} />
 
-        <DigitButton digit={1} dispatch={dispatch} />
+        <DigitButton digit={'1'} dispatch={dispatch} />
 
-        <DigitButton digit={2} dispatch={dispatch} />
+        <DigitButton digit={'2'} dispatch={dispatch} />
 
-        <DigitButton digit={3} dispatch={dispatch} />
+        <DigitButton digit={'3'} dispatch={dispatch} />
 
-        <button
-          onClick={() => dispatch({ type: 'operation', selectedOperator: '-' })}
-        >
-          -
-        </button>
+        <OperatorButton operator={'-'} dispatch={dispatch} />
 
-        <DigitButton digit={0} dispatch={dispatch} />
+        <DigitButton digit={'0'} dispatch={dispatch} />
 
         <DigitButton digit={'.'} dispatch={dispatch} />
 
