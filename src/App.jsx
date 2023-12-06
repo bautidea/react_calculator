@@ -59,7 +59,8 @@ const reducer = (state, action) => {
     }
 
     case ACTIONS.DELETE_DIGIT: {
-      if (checkIfOperator()) return state;
+      if (state.currentOperand && checkIfOperator() && !state.operator)
+        return initialState;
 
       return {
         ...state,
@@ -98,12 +99,7 @@ const reducer = (state, action) => {
     }
 
     case ACTIONS.EVALUATE: {
-      if (
-        !state.currentOperand ||
-        state.currentOperand === '.' ||
-        !state.operator
-      )
-        return state;
+      if (!state.currentOperand || !state.operator) return state;
 
       return {
         currentOperand: evaluateResult(),
@@ -114,6 +110,20 @@ const reducer = (state, action) => {
     default:
       return state;
   }
+};
+
+const INT_FORMATTER = new Intl.NumberFormat('en-us', {
+  maximumFractionDigits: 0,
+});
+
+const formatOperand = (operand) => {
+  if (!operand) return;
+
+  const [integer, decimal] = operand.split('.');
+
+  if (!decimal) return INT_FORMATTER.format(integer);
+
+  return `${INT_FORMATTER.format(integer)}.${decimal}`;
 };
 
 const initialState = {
@@ -133,19 +143,21 @@ function App() {
       <div className="calculator">
         <div className="output">
           <div className="previous-operand">
-            {previousOperand} {operator}
+            {formatOperand(previousOperand)} {operator}
           </div>
-          <div className="current-operand">{currentOperand}</div>
+          <div className="current-operand">{formatOperand(currentOperand)}</div>
         </div>
 
         <button
           className="span-two"
-          onClick={() => dispatch({ type: 'clear' })}
+          onClick={() => dispatch({ type: ACTIONS.CLEAR })}
         >
           AC
         </button>
 
-        <button onClick={() => dispatch({ type: 'delDigit' })}>DEL</button>
+        <button onClick={() => dispatch({ type: ACTIONS.DELETE_DIGIT })}>
+          DEL
+        </button>
 
         <OperatorButton operator={'/'} dispatch={dispatch} />
 
@@ -179,7 +191,7 @@ function App() {
 
         <button
           className="span-two"
-          onClick={() => dispatch({ type: 'evaluate' })}
+          onClick={() => dispatch({ type: ACTIONS.EVALUATE })}
         >
           =
         </button>
